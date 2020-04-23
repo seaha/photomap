@@ -26,13 +26,9 @@
         }).addTo(mymap);
 
         var markers = L.markerClusterGroup();
-        var photoList = new Array();
         function photos(res){
-            for(var i=0;i<res.length;i++){
-                photoList[i] = res[i].file_path;
-            }
+            console.log(res[0]['Image Make']);
         }
-        console.log(photoList);
         
     </script>
     <script src="photos.json?callback=photos"></script>

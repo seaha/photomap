@@ -18,9 +18,9 @@ __author__ = 'RuanMing'
 ''' 
 
 JSON_PATH='photos.json'
-__n=0  # 读取的文件个数
-__ni=0 # 照片的个数
-__ng=0 # 存入json的个数
+_n=0  # 读取的文件个数
+_ni=0 # 照片的个数
+_ng=0 # 存入json的个数
 
 def app_run():
     root = tk.Tk()
@@ -33,23 +33,29 @@ def app_run():
     photoList = get_pic_GPS(foldpath)
     if len(photoList) != 0:
         with open(JSON_PATH,'w',encoding='utf-8') as fw:
-            json.dump(photoList, fw, ensure_ascii=False, indent=4)
-    print('共遍历%s个文件，其中读取%s张照片，并存入json%s张照片。' % (__n,__ni,__ng))
+            s = json.dumps(photoList, ensure_ascii=False , indent=4)
+            j = 'photos(' + s + ')'
+            fw.write(j)
+    print('共遍历%s个文件，其中读取%s张照片，并存入json%s张照片。' % (_n,_ni,_ng))
 
 # 遍历文件夹及子文件夹中的所有图片,逐个文件读取exif信息
 def get_pic_GPS(pic_dir):
-    global __n,__ni, __ng
-    photoList = loadJson()
+    global _n,_ni, _ng
+    photoList = []
+    with open(JSON_PATH, 'r', encoding='utf-8') as f:
+        j = f.read()
+    if len(j) > 0:
+        photoList = loadJson2()
     items = os.listdir(pic_dir)
     for item in items:
         path = os.path.join(pic_dir, item)
         if os.path.isdir(path):
             get_pic_GPS(path)
         else:
-            __n+=1
+            _n+=1
             suffix = os.path.splitext(item)[1]
             if(suffix=='.jpg' or suffix=='.tif' or suffix=='.jpeg' or suffix=='.JPG' or suffix=='.JPEG' or suffix=='.TIF'):
-                __ni += 1
+                _ni += 1
                 if pathIsRepeat(photoList,path):
                     continue
                 photo = {}
@@ -60,17 +66,20 @@ def get_pic_GPS(pic_dir):
                 GPS = imageread(path)
                 if GPS == None:
                     continue
-                __ng += 1
+                _ng += 1
 
                 photoList.append(dict(photo, **GPS))
                 print('+++++++++++++++++++++++')
     return photoList
 
-def loadJson():
-    jsonList = []
+def loadJson2():
     with open(JSON_PATH, 'r', encoding='utf-8') as f:
-        jsonList = json.load(f)
-    return jsonList
+        jsonp_str = f.read()
+    try:
+        json_str = re.match('^[^(]*?\((.*)\)[^)]*$', jsonp_str, re.S).group(1)
+        return json.loads(json_str)
+    except:
+        raise ValueError('Invalid JSONP')
 
 def pathIsRepeat(jl, file_path):
     if len(jl) <= 0:
