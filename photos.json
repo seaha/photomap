@@ -1,0 +1,20 @@
+photos([
+    {
+        "file_name": "WechatIMG93.JPEG",
+        "file_path": "/Users/rm/Desktop/未命名文件夹 2/WechatIMG93.JPEG",
+        "GPSLatitudeRef": "N",
+        "GPSLongitudeRef": "E",
+        "DateTime": "2019-02-01 11:44:37"
+    },
+    {
+        "file_name": "IMG_20190303_113803.jpg",
+        "file_path": "/Users/rm/Desktop/未命名文件夹 2/IMG_20190303_113803.jpg",
+        "GPSLatitudeRef": "N",
+        "GPSLongitudeRef": "E",
+        "GPSLatitude": "22.83114",
+        "GPSLongitude": "108.35292799999999",
+        "DateTime": "2019-03-03 11:38:03",
+        "Image Make": "Xiaomi",
+        "Image Model": "MI 8"
+    }
+])

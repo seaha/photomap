@@ -17,7 +17,7 @@ __author__ = 'RuanMing'
 3.利用百度地图API接口将经纬度转换成地址
 ''' 
 
-JSON_PATH=r'E:\Resource\Photos.json'
+JSON_PATH='photos.json'
 __n=0  # 读取的文件个数
 __ni=0 # 照片的个数
 __ng=0 # 存入json的个数
@@ -50,9 +50,8 @@ def get_pic_GPS(pic_dir):
             suffix = os.path.splitext(item)[1]
             if(suffix=='.jpg' or suffix=='.tif' or suffix=='.jpeg' or suffix=='.JPG' or suffix=='.JPEG' or suffix=='.TIF'):
                 __ni += 1
-
-                """ if Photo.objects.filter(file_path=path):
-                    continue """
+                if jsonIsRepeat(path):
+                    continue
                 photo = {}
                 photo['file_name'] = item
                 print(item)
@@ -67,9 +66,12 @@ def get_pic_GPS(pic_dir):
                 print('+++++++++++++++++++++++')
     return photoList
 
-def json_all_objects():
+def jsonIsRepeat(file_path):
     f = open(JSON_PATH, encoding='utf-8')
-    return json.load(f)
+    for j in json.load(f):
+        if j.get('file_path','') == file_path:
+            return True
+    return False
 
 # 将经纬度转换为小数形式
 def convert_to_decimal(*gps):
