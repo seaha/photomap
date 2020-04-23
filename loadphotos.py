@@ -32,14 +32,14 @@ def app_run():
     
     photoList = get_pic_GPS(foldpath)
     if len(photoList) != 0:
-        fw = open(JSON_PATH,'w',encoding='utf-8')
-        json.dump(photoList, fw, ensure_ascii=False, indent=4)
+        with open(JSON_PATH,'w',encoding='utf-8') as fw:
+            json.dump(photoList, fw, ensure_ascii=False, indent=4)
     print('共遍历%s个文件，其中读取%s张照片，并存入json%s张照片。' % (__n,__ni,__ng))
 
 # 遍历文件夹及子文件夹中的所有图片,逐个文件读取exif信息
 def get_pic_GPS(pic_dir):
     global __n,__ni, __ng
-    photoList = []
+    photoList = loadJson()
     items = os.listdir(pic_dir)
     for item in items:
         path = os.path.join(pic_dir, item)
@@ -50,7 +50,7 @@ def get_pic_GPS(pic_dir):
             suffix = os.path.splitext(item)[1]
             if(suffix=='.jpg' or suffix=='.tif' or suffix=='.jpeg' or suffix=='.JPG' or suffix=='.JPEG' or suffix=='.TIF'):
                 __ni += 1
-                if jsonIsRepeat(path):
+                if pathIsRepeat(photoList,path):
                     continue
                 photo = {}
                 photo['file_name'] = item
@@ -66,12 +66,20 @@ def get_pic_GPS(pic_dir):
                 print('+++++++++++++++++++++++')
     return photoList
 
-def jsonIsRepeat(file_path):
-    f = open(JSON_PATH, encoding='utf-8')
-    for j in json.load(f):
-        if j.get('file_path','') == file_path:
+def loadJson():
+    jsonList = []
+    with open(JSON_PATH, 'r', encoding='utf-8') as f:
+        jsonList = json.load(f)
+    return jsonList
+
+def pathIsRepeat(jl, file_path):
+    if len(jl) <= 0:
+        return False
+    for j in jl:
+        if j.get('file_path') == file_path:
             return True
     return False
+
 
 # 将经纬度转换为小数形式
 def convert_to_decimal(*gps):
