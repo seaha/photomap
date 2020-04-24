@@ -17,7 +17,7 @@ __author__ = 'RuanMing'
 3.利用百度地图API接口将经纬度转换成地址
 ''' 
 
-JSON_PATH='photos.json'
+JSON_PATH='/Users/rm/Projects/Resource/photomap/photos.json'
 _n=0  # 读取的文件个数
 _ni=0 # 照片的个数
 _ng=0 # 存入json的个数
@@ -30,7 +30,12 @@ def app_run():
     if foldpath.strip() == '':
         return 
     
-    photoList = get_pic_GPS(foldpath)
+    photoList = []
+    with open(JSON_PATH, 'r', encoding='utf-8') as f:
+        j = f.read()
+    if len(j) > 0:
+        photoList = loadJson2()
+    photoList = get_pic_GPS(foldpath, photoList)
     if len(photoList) != 0:
         with open(JSON_PATH,'w',encoding='utf-8') as fw:
             s = json.dumps(photoList, ensure_ascii=False , indent=4)
@@ -39,18 +44,14 @@ def app_run():
     print('共遍历%s个文件，其中读取%s张照片，并存入json%s张照片。' % (_n,_ni,_ng))
 
 # 遍历文件夹及子文件夹中的所有图片,逐个文件读取exif信息
-def get_pic_GPS(pic_dir):
+def get_pic_GPS(pic_dir, photoList):
     global _n,_ni, _ng
-    photoList = []
-    with open(JSON_PATH, 'r', encoding='utf-8') as f:
-        j = f.read()
-    if len(j) > 0:
-        photoList = loadJson2()
+    
     items = os.listdir(pic_dir)
     for item in items:
         path = os.path.join(pic_dir, item)
         if os.path.isdir(path):
-            get_pic_GPS(path)
+            get_pic_GPS(path, photoList)
         else:
             _n+=1
             suffix = os.path.splitext(item)[1]
@@ -174,6 +175,8 @@ def imageread(path):
         # 将纬度转换为小数形式
         GPS['GPSLatitude'] = convert_to_decimal(deg, minu, sec, GPS['GPSLatitudeRef'])
         print(GPS['GPSLatitude'])
+    else:
+        return None
 
     # 获取经度
     if 'GPS GPSLongitude' in tags:
@@ -187,6 +190,8 @@ def imageread(path):
         # 将经度转换为小数形式
         GPS['GPSLongitude'] = convert_to_decimal(deg, minu, sec, GPS['GPSLongitudeRef'])  # 对特殊的经纬度格式进行处理
         print(GPS['GPSLongitude'])
+    else:
+        return None
 
     # 获取图片拍摄时间
     if 'Image DateTime' in tags:
